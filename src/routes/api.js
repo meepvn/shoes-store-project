@@ -6,7 +6,9 @@ function initAPIRoute(app){
         res.json({
             customer:{
                 get:"/",
-                post:'/create'
+                post:'/create',
+                put:"/:id,edit",
+                delete:"/:id"
             }
         })
     })
