@@ -3,6 +3,7 @@ const { route } = require('express/lib/application');
 const router = express.Router();
 const customerController = require('../controllers/CustomerController');
 
+router.get('/find/:name',customerController.getCustomerByNameRelatively);
 router.post('/create',customerController.insertCustomer)
 router.delete('/:id',customerController.deleteCustomer);
 router.put('/:id/edit',customerController.updateCustomerByID);

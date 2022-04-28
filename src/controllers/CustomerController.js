@@ -5,6 +5,10 @@ class CustomerController{
         const [customers] = await pool.execute('select * from khachhang');
         res.status(200).json(customers);
     }
+    async getCustomerByNameRelatively(req,res){
+        const [customer] = await pool.execute(`select * from khachhang where TENKH like concat('%',?,'%')`,[req.params.name]);
+        res.status(200).json(customer);
+    }
     async getCustomerByID(req,res){
         const [customer] = await pool.execute('select * from khachhang where MaKH = ?',[req.params.id]);
         res.status(200).json(customer);
@@ -16,7 +20,7 @@ class CustomerController{
             });
         }
         const {name,phone,address,email} = req.body;
-        await pool.execute(`update customers set TenKH = ?, 
+        await pool.execute(`update khachhang set TenKH = ?, 
         SDT = ?, DiaChi = ?, Email = ? where MaKH = ? `,[name,phone,address,email,req.params.id]);
         res.status(200).json({
             message:"ok, updated"
