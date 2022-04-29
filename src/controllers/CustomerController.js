@@ -33,10 +33,16 @@ class CustomerController{
             });
         }
         const {name,phone,address,email} = req.body;
-        const [customer] = await pool.execute(`insert into khachhang (TenKH,SDT,DiaChi,Email) 
+        const [customer,field] = await pool.execute(`insert into khachhang (TenKH,SDT,DiaChi,Email) 
         values (?,?,?,?) `,[name,phone,address,email]);
         res.status(200).json({
             message:'Success',
+            insertedData:{
+                name,
+                phone,
+                address,
+                email
+            }
         })
     }
     
