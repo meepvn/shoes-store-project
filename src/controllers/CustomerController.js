@@ -47,6 +47,11 @@ class CustomerController{
     }
     
     async deleteCustomer(req,res){
+        if(!req.params.id){
+            return res.json({
+                message:'failed'
+            })
+        }
         await pool.execute(`delete from khachhang where MaKH = ?`,[req.params.id]);
         res.status(200).json({
             message:"ok, deleted"
