@@ -33,11 +33,12 @@ class CustomerController{
             });
         }
         const {name,phone,address,email} = req.body;
-        await pool.execute(`insert into khachhang (TenKH,SDT,DiaChi,Email) 
+        const [result] = await pool.execute(`insert into khachhang (TenKH,SDT,DiaChi,Email) 
         values (?,?,?,?) `,[name,phone,address,email]);
         res.status(200).json({
             message:'Success',
             insertedData:{
+                id:result.insertId,
                 name,
                 phone,
                 address,
@@ -48,9 +49,10 @@ class CustomerController{
     
     async deleteCustomer(req,res){
         if(!req.params.id){
-            return res.json({
+            res.json({
                 message:'failed'
-            })
+            });
+            return;
         }
         await pool.execute(`delete from khachhang where MaKH = ?`,[req.params.id]);
         res.status(200).json({
