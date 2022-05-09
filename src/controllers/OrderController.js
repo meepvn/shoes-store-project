@@ -5,6 +5,7 @@ class OrderController {
     const [orders] = await pool.execute("select * from donhang");
     res.status(200).json(orders);
   }
+
   async createOrder(req, res) {
     if (!req.body.customerID) {
       return res.json({
@@ -13,7 +14,7 @@ class OrderController {
     }
     const { customerID } = req.body;
     const [order] = await pool.execute(
-      "insert into donhang (MaKH,NgayTao,TinhTrang,GhiChu) values (?,now(),?,?)",
+      `insert into donhang (MaKH,NgayTao,TinhTrang,GhiChu) values (?,now(),?,?)`,
       [customerID, "Chờ xác nhận", "Không"]
     );
     res.status(200).json({
