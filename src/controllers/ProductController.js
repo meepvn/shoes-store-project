@@ -35,6 +35,8 @@ class ProductController {
     });
   }
   async insertProduct(req, res) {
+    console.log(req.file);
+    console.log(req.query);
     if (
       !req.body.TenSP ||
       !req.body.SoLuong ||
