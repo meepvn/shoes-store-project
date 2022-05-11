@@ -23,20 +23,18 @@ class OrderController {
     });
   }
 
-  async AddOrderDetail(req, res) {
-    if (!req.body.data || !req.body.orderId) {
-      return res.status(200).json({
-        message: "Missing data data",
-      });
-    }
-    const { orderId, data: details } = req.body;
-    details.forEach(async (value) => {
-      const [result] = await pool.execute(
-        "insert into chitietdonhang  values (?,?,?)",
-        [orderId, ...value]
-      );
+  async deleteOrder(req, res) {
+    await pool.execute(`delete from chitietdonhang where MaDH = ?`, [
+      req.params.id,
+    ]);
+    await pool.execute(`delete from donhang where MaDH = ?`, [req.params.id]);
+    res.status(200).json({
+      message: "ok, deleted",
     });
-    res.status(200).json("Ok. Added");
+  }
+
+  async updateOrder(req, res) {
+    res.json("ok");
   }
 }
 

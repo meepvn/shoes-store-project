@@ -21,20 +21,20 @@ class CustomerController {
   }
   async updateCustomerByID(req, res) {
     if (
-      !req.body.name ||
-      !req.body.phone ||
-      !req.body.address ||
-      !req.body.email
+      !req.body.TenKH ||
+      !req.body.SDT ||
+      !req.body.DiaChi ||
+      !req.body.Email
     ) {
       return res.json({
         message: "Missing required parameter(s)",
       });
     }
-    const { name, phone, address, email } = req.body;
+    const { TenKH, SDT, DiaChi, Email } = req.body;
     await pool.execute(
       `update khachhang set TenKH = ?, 
         SDT = ?, DiaChi = ?, Email = ? where MaKH = ? `,
-      [name, phone, address, email, req.params.id]
+      [TenKH, SDT, DiaChi, Email, req.params.id]
     );
     res.status(200).json({
       message: "ok, updated",
@@ -42,30 +42,30 @@ class CustomerController {
   }
   async insertCustomer(req, res) {
     if (
-      !req.body.name ||
-      !req.body.phone ||
-      !req.body.address ||
-      !req.body.email
+      !req.body.TenKH ||
+      !req.body.SDT ||
+      !req.body.DiaChi ||
+      !req.body.Email
     ) {
       return res.json({
         message: "Missing required parameter(s)",
       });
     }
-    const { name, phone, address, email } = req.body;
+    const { TenKH, SDT, DiaChi, Email } = req.body;
     const [result] = await pool.execute(
       `insert into khachhang (TenKH,SDT,DiaChi,Email) 
               values (?,?,?,?) `,
-      [name, phone, address, email]
+      [TenKH, SDT, DiaChi, Email]
     );
 
     res.status(200).json({
       message: "Success",
       insertedData: {
         id: result.insertId,
-        name,
-        phone,
-        address,
-        email,
+        TenKH,
+        SDT,
+        DiaChi,
+        Email,
       },
     });
   }
