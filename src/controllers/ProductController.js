@@ -25,17 +25,34 @@ class ProductController {
       });
     }
     const { TenSP, SoLuong, DonGia, HangSX, Loai } = req.body;
-    await pool.execute(
-      `update sanpham set TenSP = ?, 
-        SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ? where MaSP = ? `,
-      [TenSP, SoLuong, DonGia, Loai, HangSX, req.params.id]
-    );
+    if (req.file) {
+      const string = req.file.path.split("\\");
+      await pool.execute(
+        `update sanpham set TenSP = ?, 
+          SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ?, ImageName = ? where MaSP = ? `,
+        [
+          TenSP,
+          SoLuong,
+          DonGia,
+          Loai,
+          HangSX,
+          string[string.length - 1],
+          req.params.id,
+        ]
+      );
+    } else {
+      await pool.execute(
+        `update sanpham set TenSP = ?, 
+          SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ? where MaSP = ? `,
+        [TenSP, SoLuong, DonGia, Loai, HangSX, req.params.id]
+      );
+    }
     res.status(200).json({
       message: "ok, updated",
     });
   }
   async insertProduct(req, res) {
-    console.log(req.file);
+    console.log(req.file.path.split("\\"));
     console.log(req.query);
     if (
       !req.body.TenSP ||
@@ -48,12 +65,23 @@ class ProductController {
         message: "Missing required parameter(s)",
       });
     }
+    console.log();
     const { TenSP, SoLuong, DonGia, HangSX, Loai } = req.body;
-    await pool.execute(
-      `insert into sanpham (TenSP,Loai,HangSX,DonGia,SoLuong) 
-        values (?,?,?,?,?) `,
-      [TenSP, Loai, HangSX, DonGia, SoLuong]
-    );
+    if (req.file) {
+      const string = req.file.path.split("\\");
+      await pool.execute(
+        `insert into sanpham (TenSP,Loai,HangSX,DonGia,SoLuong,ImageName) 
+          values (?,?,?,?,?,?) `,
+        [TenSP, Loai, HangSX, DonGia, SoLuong, string[string.length - 1]]
+      );
+    } else {
+      await pool.execute(
+        `insert into sanpham (TenSP,Loai,HangSX,DonGia,SoLuong) 
+          values (?,?,?,?,?) `,
+        [TenSP, Loai, HangSX, DonGia, SoLuong]
+      );
+    }
+
     res.status(200).json({
       message: "Success",
     });
