@@ -26,19 +26,10 @@ class ProductController {
     }
     const { TenSP, SoLuong, DonGia, HangSX, Loai } = req.body;
     if (req.file) {
-      const string = req.file.path.split("\\");
       await pool.execute(
         `update sanpham set TenSP = ?, 
           SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ?, ImageName = ? where MaSP = ? `,
-        [
-          TenSP,
-          SoLuong,
-          DonGia,
-          Loai,
-          HangSX,
-          string[string.length - 1],
-          req.params.id,
-        ]
+        [TenSP, SoLuong, DonGia, Loai, HangSX, req.file.filename, req.params.id]
       );
     } else {
       await pool.execute(
@@ -52,7 +43,7 @@ class ProductController {
     });
   }
   async insertProduct(req, res) {
-    console.log(req.file.path.split("\\"));
+    console.log(req.file);
     console.log(req.query);
     if (
       !req.body.TenSP ||
@@ -68,11 +59,10 @@ class ProductController {
     console.log();
     const { TenSP, SoLuong, DonGia, HangSX, Loai } = req.body;
     if (req.file) {
-      const string = req.file.path.split("\\");
       await pool.execute(
         `insert into sanpham (TenSP,Loai,HangSX,DonGia,SoLuong,ImageName) 
           values (?,?,?,?,?,?) `,
-        [TenSP, Loai, HangSX, DonGia, SoLuong, string[string.length - 1]]
+        [TenSP, Loai, HangSX, DonGia, SoLuong, req.file.filename]
       );
     } else {
       await pool.execute(

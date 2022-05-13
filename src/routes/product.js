@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/ProductController");
 const multer = require("multer");
+const path = require("path");
 
 const storageEngine = multer.diskStorage({
   destination: (req, res, cb) => {
@@ -10,13 +11,18 @@ const storageEngine = multer.diskStorage({
   filename: (req, file, cb) => {
     console.log(req.query);
     cb(null, Date.now() + "-" + file.originalname);
-    // } else {
-    //   console.log(req.body);
-    //   cb(null, `${req.body.TenSP.split(" ").join("-")}.jpg`);
-    // }
   },
 });
-const upload = multer({ storage: storageEngine });
+const upload = multer({
+  storage: storageEngine,
+  fileFilter: (req, file, callback) => {
+    const ext = path.extname(file.originalname);
+    if (ext !== ".png" && ext !== ".jpg" && ext !== ".gif" && ext !== ".jpeg") {
+      return callback(new Error("Only images are allowed"));
+    }
+    callback(null, true);
+  },
+});
 
 router.delete("/:id", productController.deleteProduct);
 router.put(
