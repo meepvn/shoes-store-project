@@ -9,7 +9,7 @@ const validateUsername = (username) => {
 };
 
 const validatePassword = (password) => {
-  const regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$");
+  const regex = /^(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z]).{8,15}$/;
   return regex.test(password);
 };
 
@@ -47,7 +47,8 @@ class UserController {
       });
     if (!validatePassword(MatKhau))
       return res.json({
-        message: "Mật khẩu không hợp lệ",
+        message:
+          "Mật khẩu không hợp lệ (8-15 kí tự, ít nhất 1 chữ hoa, 1 chữ thường, 1 kí tự số)",
       });
     if (!validatePhone(SDT))
       return res.json({

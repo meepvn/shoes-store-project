@@ -26,25 +26,29 @@ class ProductController {
     }
     const { TenSP, SoLuong, DonGia, HangSX, Loai } = req.body;
     if (req.file) {
-      await pool.execute(
+      const [result] = await pool.execute(
         `update sanpham set TenSP = ?, 
           SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ?, ImageName = ? where MaSP = ? `,
         [TenSP, SoLuong, DonGia, Loai, HangSX, req.file.filename, req.params.id]
       );
+      return res.status(200).json({
+        message: "Ok, updated with image",
+        filename: req.file.filename,
+      });
     } else {
       await pool.execute(
         `update sanpham set TenSP = ?, 
           SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ? where MaSP = ? `,
         [TenSP, SoLuong, DonGia, Loai, HangSX, req.params.id]
       );
+      return res.status(200).json({
+        message: "ok, updated",
+      });
     }
-    res.status(200).json({
-      message: "ok, updated",
-    });
   }
   async insertProduct(req, res) {
     console.log(req.file);
-    console.log(req.query);
+    console.log(req.body);
     if (
       !req.body.TenSP ||
       !req.body.SoLuong ||
@@ -56,16 +60,16 @@ class ProductController {
         message: "Missing required parameter(s)",
       });
     }
-    console.log();
+    let result;
     const { TenSP, SoLuong, DonGia, HangSX, Loai } = req.body;
     if (req.file) {
-      await pool.execute(
+      [result] = await pool.execute(
         `insert into sanpham (TenSP,Loai,HangSX,DonGia,SoLuong,ImageName) 
           values (?,?,?,?,?,?) `,
         [TenSP, Loai, HangSX, DonGia, SoLuong, req.file.filename]
       );
     } else {
-      await pool.execute(
+      [result] = await pool.execute(
         `insert into sanpham (TenSP,Loai,HangSX,DonGia,SoLuong) 
           values (?,?,?,?,?) `,
         [TenSP, Loai, HangSX, DonGia, SoLuong]
@@ -74,6 +78,15 @@ class ProductController {
 
     res.status(200).json({
       message: "Success",
+      insertedData: {
+        MaSP: result.insertId,
+        TenSP,
+        SoLuong,
+        DonGia,
+        HangSX,
+        ImageName: req.file.filename,
+        Loai,
+      },
     });
   }
 
