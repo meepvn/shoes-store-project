@@ -11,7 +11,7 @@ class Product {
       "select * from sanpham where MaSP = ?",
       [id]
     );
-    return product;
+    return product[0];
   }
 
   async insertWithImage(TenSP, Loai, HangSX, DonGia, SoLuong, filename) {

@@ -7,11 +7,11 @@ class User {
   }
 
   async getUserByUsername(username) {
-    const [selectUsernameResult] = await pool.execute(
+    const [user] = await pool.execute(
       "select * from nhanvien where TenTK = ?",
       [username]
     );
-    return selectUsernameResult;
+    return user[0];
   }
 
   async insertUser(TenTK, MatKhau, HoTen, SDT) {

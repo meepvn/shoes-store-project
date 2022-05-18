@@ -38,7 +38,7 @@ class UserController {
       });
     const selectUsernameResult = await userModel.getUserByUsername(TenTK);
 
-    if (selectUsernameResult.length > 0) {
+    if (selectUsernameResult) {
       return res.json({
         message: "Tài khoản đã tồn tại",
       });
@@ -71,21 +71,18 @@ class UserController {
 
     const selectUserResult = await userModel.getUserByUsername(TenTK);
 
-    if (selectUserResult.length === 0)
+    if (!selectUserResult)
       return res.json({
         message: "Tài khoản không tồn tại",
         result: false,
       });
     else {
-      const loginResult = bcrypt.compareSync(
-        MatKhau,
-        selectUserResult[0].MatKhau
-      );
+      const loginResult = bcrypt.compareSync(MatKhau, selectUserResult.MatKhau);
       if (loginResult)
         return res.json({
           message: "Đăng nhập thành công",
           result: true,
-          Name: selectUserResult[0].HoTen,
+          Name: selectUserResult.HoTen,
         });
       else {
         return res.json({

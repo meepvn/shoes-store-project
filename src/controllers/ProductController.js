@@ -37,11 +37,6 @@ class ProductController {
         filename: req.file.filename,
       });
     } else {
-      // await pool.execute(
-      //   `update sanpham set TenSP = ?,
-      //     SoLuong = ?, DonGia = ?, Loai = ?, HangSX = ? where MaSP = ? `,
-      //   [TenSP, SoLuong, DonGia, Loai, HangSX, req.params.id]
-      // );
       await productModel.updateWithoutImage(
         TenSP,
         SoLuong,
@@ -53,7 +48,7 @@ class ProductController {
       const product = await productModel.getOneById(req.params.id);
       return res.status(200).json({
         message: "ok, updated",
-        filename: product[0].ImageName,
+        filename: product.ImageName,
       });
     }
   }
