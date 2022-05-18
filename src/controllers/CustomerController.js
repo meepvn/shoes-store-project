@@ -1,22 +1,12 @@
-const pool = require("../configs/connectDB");
-
+const customerModel = require("../models/Customer");
 class CustomerController {
   async getAllCustomer(req, res) {
-    const [customers] = await pool.execute("select * from khachhang");
-    res.status(200).json(customers);
+    const result = await customerModel.getAll();
+    res.status(200).json(result);
   }
-  async getCustomerByNameRelatively(req, res) {
-    const [customer] = await pool.execute(
-      `select * from khachhang where TENKH like concat('%',?,'%')`,
-      [req.params.name]
-    );
-    res.status(200).json(customer);
-  }
+
   async getCustomerByID(req, res) {
-    const [customer] = await pool.execute(
-      "select * from khachhang where MaKH = ?",
-      [req.params.id]
-    );
+    const customer = await customerModel.getById(req.params.id);
     res.status(200).json(customer);
   }
   async updateCustomerByID(req, res) {
@@ -31,11 +21,9 @@ class CustomerController {
       });
     }
     const { TenKH, SDT, DiaChi, Email } = req.body;
-    await pool.execute(
-      `update khachhang set TenKH = ?, 
-        SDT = ?, DiaChi = ?, Email = ? where MaKH = ? `,
-      [TenKH, SDT, DiaChi, Email, req.params.id]
-    );
+
+    await customerModel.updateById(TenKH, SDT, DiaChi, Email, req.params.id);
+
     res.status(200).json({
       message: "ok, updated",
     });
@@ -52,16 +40,13 @@ class CustomerController {
       });
     }
     const { TenKH, SDT, DiaChi, Email } = req.body;
-    const [result] = await pool.execute(
-      `insert into khachhang (TenKH,SDT,DiaChi,Email) 
-              values (?,?,?,?) `,
-      [TenKH, SDT, DiaChi, Email]
-    );
+
+    const result = await customerModel.insert(TenKH, SDT, DiaChi, Email);
 
     res.status(200).json({
       message: "Success",
       insertedData: {
-        id: result.insertId,
+        id: result,
         TenKH,
         SDT,
         DiaChi,
@@ -76,7 +61,7 @@ class CustomerController {
       });
       return;
     }
-    await pool.execute(`delete from khachhang where MaKH = ?`, [req.params.id]);
+    await customerModel.deleteById(req.params.id);
     res.status(200).json({
       message: "ok, deleted",
     });
@@ -84,3 +69,11 @@ class CustomerController {
 }
 
 module.exports = new CustomerController();
+
+// async getCustomerByNameRelatively(req, res) {
+//   const [customer] = await pool.execute(
+//     `select * from khachhang where TENKH like concat('%',?,'%')`,
+//     [req.params.name]
+//   );
+//   res.status(200).json(customer);
+// }

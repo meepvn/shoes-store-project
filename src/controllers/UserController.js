@@ -1,28 +1,11 @@
-const pool = require("../configs/connectDB");
 const bcrypt = require("bcryptjs");
+const userModel = require("../models/User");
 
-const validateUsername = (username) => {
-  const regex = new RegExp(
-    "^[a-zA-Z0-9](_(?!(.|_))|.(?!(_|.))|[a-zA-Z0-9]){6,18}[a-zA-Z0-9]$"
-  );
-  return regex.test(username);
-};
-
-const validatePassword = (password) => {
-  const regex = /^(?=.*?[0-9])(?=.*?[a-z])(?=.*?[A-Z]).{8,15}$/;
-  return regex.test(password);
-};
-
-const validatePhone = (phone) => {
-  const regex = new RegExp(
-    "^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$"
-  );
-  return regex.test(phone);
-};
+const { validatePhone, validateUsername } = require("../ulti/validate");
 
 class UserController {
   async getAllUsers(req, res) {
-    const [users] = await pool.execute("select * from nhanvien");
+    const users = await userModel.getAll();
     res.status(200).json(users);
   }
   async insertUser(req, res) {
@@ -45,31 +28,26 @@ class UserController {
       return res.json({
         message: "Tài khoản không hợp lệ",
       });
-    if (!validatePassword(MatKhau))
-      return res.json({
-        message:
-          "Mật khẩu không hợp lệ (8-15 kí tự, ít nhất 1 chữ hoa, 1 chữ thường, 1 kí tự số)",
-      });
+    // if (!validatePassword(MatKhau))
+    //   return res.json({
+    //     message: "Mật khẩu không hợp lệ",
+    //   });
     if (!validatePhone(SDT))
       return res.json({
         message: "Số điện thoại không hợp lệ",
       });
-    const [selectUsernameResult] = await pool.execute(
-      "select TenTK from nhanvien where TenTK = ?",
-      [TenTK]
-    );
+    const selectUsernameResult = await userModel.getUserByUsername(TenTK);
+
     if (selectUsernameResult.length > 0) {
       return res.json({
         message: "Tài khoản đã tồn tại",
       });
     }
+
     const salt = bcrypt.genSaltSync(10);
     const hashedPwd = bcrypt.hashSync(MatKhau, salt);
-    await pool.execute(
-      `insert into nhanvien  
-              values (?,?,?,?) `,
-      [TenTK, hashedPwd, HoTen, SDT]
-    );
+
+    await userModel.insertUser(TenTK, hashedPwd, HoTen, SDT);
 
     res.status(200).json({
       message: "Success",
@@ -81,42 +59,41 @@ class UserController {
       },
     });
   }
+
   async loginResult(req, res) {
     if (!req.body.TenTK || !req.body.MatKhau) {
-      res.json({
+      return res.json({
         message: "Request không có tài khoản / mật khẩu",
         result: false,
       });
     }
     const { TenTK, MatKhau } = req.body;
-    const [selectPasswordResult] = await pool.execute(
-      `select MatKhau from nhanvien where TenTK = ?`,
-      [TenTK]
-    );
-    if (selectPasswordResult.length === 0)
-      res.json({
+
+    const selectUserResult = await userModel.getUserByUsername(TenTK);
+
+    if (selectUserResult.length === 0)
+      return res.json({
         message: "Tài khoản không tồn tại",
         result: false,
       });
     else {
       const loginResult = bcrypt.compareSync(
         MatKhau,
-        selectPasswordResult[0].MatKhau
+        selectUserResult[0].MatKhau
       );
       if (loginResult)
-        res.json({
+        return res.json({
           message: "Đăng nhập thành công",
           result: true,
+          Name: selectUserResult[0].HoTen,
         });
       else {
-        res.json({
+        return res.json({
           message: "Tài khoản hoặc mật khẩu không đúng",
           result: false,
         });
       }
     }
-
-    // res.json(result);
   }
 }
 
